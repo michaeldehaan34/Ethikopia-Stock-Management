@@ -230,3 +230,4 @@ Sistem **Ethikopia Coffeebay** dikembangkan sebagai solusi manajemen operasional
 - **Portabilitas** — aplikasi web yang dapat diakses dari berbagai perangkat.
 
 Dibangun dengan arsitektur MVC Laravel, sistem ini mengimplementasikan konsep **Single Source of Truth** melalui service `StockAnalytics` untuk seluruh perhitungan analitik, serta **export service** yang menghasilkan laporan dalam format PDF dan Excel sesuai standar pelaporan profesional.
+
