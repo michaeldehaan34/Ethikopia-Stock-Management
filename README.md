@@ -169,37 +169,53 @@ Akses aplikasi di `http://localhost:8000`.
 
 | Dashboard | Data Barista |
 |-----------|-------------|
-| *Placeholder: screenshot dashboard* | *Placeholder: screenshot data barista* |
+| <img width="1356" height="634" alt="image" src="https://github.com/user-attachments/assets/2831cff6-1e17-441d-8ecf-9214f40af84f" />
+ | <img width="1358" height="635" alt="image" src="https://github.com/user-attachments/assets/3c6d72ee-08d5-480b-afba-c11ab45b55c6" />
+ |
 
 | Master Bahan | Pengaturan Limit |
 |-------------|-----------------|
-| *Placeholder: screenshot master bahan* | *Placeholder: screenshot pengaturan limit* |
+| <img width="1356" height="631" alt="image" src="https://github.com/user-attachments/assets/02823214-3202-45f1-832b-0cd1e2d5dafb" />
+ | <img width="1357" height="631" alt="image" src="https://github.com/user-attachments/assets/f2fccc53-0e13-4e66-8afd-c466e6c5e0e7" />
+|
 
 | Forecast | Laporan |
 |----------|---------|
-| *Placeholder: screenshot forecast* | *Placeholder: screenshot laporan* |
+| <img width="1356" height="629" alt="image" src="https://github.com/user-attachments/assets/aa28a0cb-cf88-415c-b608-6ada85b7b62d" />
+ | <img width="1359" height="635" alt="image" src="https://github.com/user-attachments/assets/6d4dc2e4-026e-437b-a302-0e9642d42dc6" />
+ |
 
 | Riwayat Stok Masuk | Riwayat Update Stok |
 |--------------------|-------------------|
-| *Placeholder: screenshot riwayat stok masuk* | *Placeholder: screenshot riwayat update stok* |
+| <img width="1357" height="635" alt="image" src="https://github.com/user-attachments/assets/e0d6b136-b9aa-42b1-8255-6f06f33fc29a" />
+ | <img width="1355" height="631" alt="image" src="https://github.com/user-attachments/assets/fcd38804-da54-4dfc-985c-f192ec536508" />
+ |
 
 | Riwayat Token Listrik | Riwayat Daily Clean |
 |-----------------------|--------------------|
-| *Placeholder: screenshot riwayat token listrik* | *Placeholder: screenshot riwayat daily clean* |
+| <img width="1357" height="632" alt="image" src="https://github.com/user-attachments/assets/02b1dd61-1f04-409d-9a8e-02859e293ade" />
+ | <img width="1351" height="635" alt="image" src="https://github.com/user-attachments/assets/9959c534-f448-4f78-96b9-8afab72763e4" />
+ |
 
 ### Halaman Barista
 
 | Login | Dashboard Barista |
 |-------|------------------|
-| *Placeholder: screenshot login* | *Placeholder: screenshot dashboard barista* |
+| <img width="1357" height="630" alt="image" src="https://github.com/user-attachments/assets/31933729-e586-4fc2-9d65-d1cf9995e9fa" />
+ | <img width="1359" height="631" alt="image" src="https://github.com/user-attachments/assets/b282a686-9956-4e24-9e21-ec7e7beeb5f3" />
+ |
 
 | Input Stok Masuk | Update Stok |
 |-----------------|-------------|
-| *Placeholder: screenshot input stok masuk* | *Placeholder: screenshot update stok* |
+| <img width="1355" height="631" alt="image" src="https://github.com/user-attachments/assets/66213136-313a-4b90-a53e-3d5b80bd910d" />
+ | <img width="1358" height="632" alt="image" src="https://github.com/user-attachments/assets/23b91e90-3f79-44ec-aa77-e84288c32afa" />
+|
 
 | Daily Clean | Token Listrik |
 |-------------|---------------|
-| *Placeholder: screenshot daily clean* | *Placeholder: screenshot token listrik* |
+| <img width="1358" height="631" alt="image" src="https://github.com/user-attachments/assets/65c474e1-5017-422c-9b12-85ab2b664808" />
+ | <img width="1357" height="636" alt="image" src="https://github.com/user-attachments/assets/ea0e9983-f744-42a1-83e2-40a261898847" />
+ |
 
 ---
 
