@@ -65,6 +65,7 @@ Route::middleware(['session.auth', 'role:manager'])->group(function () {
     Route::get('/manager/dashboard', [DashboardController::class, 'dashboard'])
         ->name('manager.dashboard');
 
+
     Route::get('/manager/riwayat/stok-masuk', [StokMasukController::class, 'index'])
         ->name('manager.stok-masuk.index');
     Route::get('/manager/stok-masuk/create', [StokMasukController::class, 'create'])

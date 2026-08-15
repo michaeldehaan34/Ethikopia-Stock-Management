@@ -97,80 +97,59 @@
         </div>
     </div>
 
-    <!-- 2 & 3. Top Barang Paling Sering Habis & Hampir Habis -->
+    <!-- STOK SAAT INI -->
     <div class="row g-4 mb-4">
-        <!-- Top Barang Sering Habis -->
-        <div class="col-12 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h5 class="mb-3">
-                        <i class="bi bi-exclamation-octagon-fill me-2 text-rose"></i>
-                        Barang Yang Paling Sering Habis
-                    </h5>
-                    @if(count($top_barang_habis) > 0)
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-box-seam me-2 text-primary"></i>
+                            Stok Saat Ini
+                        </h5>
+                        <div class="w-100 ms-3" style="max-width: 300px;">
+                            <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari bahan baku...">
+                        </div>
+                    </div>
+                    @if(count($stok_saat_ini ?? []) > 0)
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover align-middle mb-0" id="stokTable">
+                            <thead class="sticky-top bg-white">
                                 <tr>
-                                    <th style="width: 12%;">Rank</th>
-                                    <th>Nama Barang</th>
-                                    <th style="width: 22%;">Jumlah Habis</th>
+                                    <th>Nama Bahan</th>
+                                    <th>Stok Saat Ini</th>
+                                    <th>Satuan</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($top_barang_habis as $item)
-                                <tr>
-                                    <td>{{ $item['rank'] }}</td>
-                                    <td>{{ $item['nama_barang'] }}</td>
-                                    <td><span class="badge bg-danger">{{ $item['jumlah'] }}x</span></td>
+                                @foreach($stok_saat_ini as $item)
+                                <tr class="stok-row">
+                                    <td class="bahan-nama">{{ $item['nama'] }}</td>
+                                    <td><strong>{{ $item['stok'] }}</strong></td>
+                                    <td><span class="text-muted">{{ $item['satuan'] }}</span></td>
+                                    <td>
+                                        @if($item['status'] == 'aman')
+                                        <span class="badge bg-success">Aman</span>
+                                        @elseif($item['status'] == 'tipis')
+                                        <span class="badge bg-warning text-dark">Limit</span>
+                                        @else
+                                        <span class="badge bg-danger">Habis</span>
+                                        @endif
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                     @else
-                    <p class="text-muted mb-0">Belum ada data barang habis.</p>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Top Barang Hampir Habis -->
-        <div class="col-12 col-md-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <h5 class="mb-3">
-                        <i class="bi bi-exclamation-triangle-fill me-2 text-amber"></i>
-                        Barang Yang Hampir Habis
-                    </h5>
-                    @if(count($top_barang_tipis) > 0)
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th style="width: 12%;">Rank</th>
-                                    <th>Nama Barang</th>
-                                    <th style="width: 22%;">Jumlah Tipis</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($top_barang_tipis as $item)
-                                <tr>
-                                    <td>{{ $item['rank'] }}</td>
-                                    <td>{{ $item['nama_barang'] }}</td>
-                                    <td><span class="badge bg-warning text-dark">{{ $item['jumlah'] }}x</span></td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @else
-                    <p class="text-muted mb-0">Belum ada data barang tipis.</p>
+                    <p class="text-muted mb-0">Belum ada data stok.</p>
                     @endif
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- 4. Aktivitas Barista -->
     <div class="row g-4 mb-4">
@@ -211,4 +190,25 @@
     </div>
     @endif
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.stok-row');
+                
+                rows.forEach(row => {
+                    const namaBahan = row.querySelector('.bahan-nama').textContent.toLowerCase();
+                    if (namaBahan.includes(filter)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
 @endsection

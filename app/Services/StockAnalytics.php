@@ -298,6 +298,77 @@ class StockAnalytics
         return $result;
     }
 
+    public static function getCurrentStocks(): array
+    {
+        $keys = Bahan::activeKeys();
+        
+        $updateCols = \Illuminate\Support\Facades\Schema::getColumnListing('update_stok');
+        $masukCols = \Illuminate\Support\Facades\Schema::getColumnListing('stok_masuk');
+        
+        $validKeys = [];
+        foreach ($keys as $k) {
+            if (in_array($k, $updateCols) && in_array($k, $masukCols)) {
+                $validKeys[] = $k;
+            }
+        }
+        
+        if (empty($validKeys)) {
+            return [];
+        }
+
+        $updates = UpdateStok::query()
+            ->select(array_merge(['id', 'created_at'], $validKeys))
+            ->orderByDesc('tanggal')
+            ->orderByDesc('id')
+            ->get();
+            
+        $masuks = StokMasuk::query()
+            ->select(array_merge(['id', 'created_at'], $validKeys))
+            ->get();
+
+        $bahanMap = self::activeMap();
+        $limitMap = self::limitMap();
+        
+        $currentStocks = [];
+        foreach ($validKeys as $key) {
+            $latestUpdateVal = 0.0;
+            $latestUpdateDate = null;
+            
+            foreach ($updates as $u) {
+                if ($u->$key !== null && $u->$key !== '') {
+                    $latestUpdateVal = self::toFloat($u->$key) ?? 0.0;
+                    $latestUpdateDate = $u->created_at;
+                    break;
+                }
+            }
+            
+            $sumMasuk = 0.0;
+            foreach ($masuks as $m) {
+                if ($m->$key !== null && $m->$key !== '') {
+                    if ($latestUpdateDate === null || ($m->created_at && $m->created_at > $latestUpdateDate)) {
+                        $sumMasuk += self::toFloat($m->$key) ?? 0.0;
+                    }
+                }
+            }
+            
+            $actual = $latestUpdateVal + $sumMasuk;
+            
+            [$lh, $lt] = $limitMap[$key] ?? [self::DEFAULT_LIMIT_HABIS, self::DEFAULT_LIMIT_TIPIS];
+            $status = self::classify($actual, $lh, $lt);
+            
+            $currentStocks[$key] = [
+                'kode' => $key,
+                'nama' => $bahanMap[$key]['nama'] ?? $key,
+                'stok' => self::formatNumber($actual),
+                'satuan' => $bahanMap[$key]['satuan'] ?? 'pcs',
+                'status' => $status,
+                'raw_stok' => $actual
+            ];
+        }
+        
+        return $currentStocks;
+    }
+
     /**
      * Ringkas seluruh metrik Dashboard Analytics dalam SATU pass
      * (summary + top habis + top tipis + aktivitas barista) dengan hanya
@@ -308,8 +379,10 @@ class StockAnalytics
     public static function dashboard(): array
     {
         $data = self::readUpdateStok();
+        $currentStocks = self::getCurrentStocks();
+        $hasAnyData = $data['has_data'] || !empty($currentStocks);
 
-        if (! $data['has_data']) {
+        if (! $hasAnyData) {
             return [
                 'has_data' => false,
                 'bahan_aman' => 0,
@@ -318,6 +391,7 @@ class StockAnalytics
                 'top_barang_habis' => [],
                 'top_barang_tipis' => [],
                 'top_aktivitas_barista' => [],
+                'stok_saat_ini' => [],
             ];
         }
 
@@ -328,14 +402,10 @@ class StockAnalytics
             $keyToLabel[$l['kode']] = $l['nama'];
         }
 
-        // Ringkasan dari stok terakhir.
+        // Ringkasan dari STOK SAAT INI (menggunakan stok aktual terbaru)
         $summary = ['aman' => 0, 'tipis' => 0, 'habis' => 0];
-        $last = $data['last_row'];
-        if ($last) {
-            foreach ($data['item_keys'] as $key) {
-                [$lh, $lt] = $limitMap[$key] ?? [self::DEFAULT_LIMIT_HABIS, self::DEFAULT_LIMIT_TIPIS];
-                $summary[self::classify($last['values'][$key] ?? null, $lh, $lt)]++;
-            }
+        foreach ($currentStocks as $item) {
+            $summary[$item['status']]++;
         }
 
         // Satu pass untuk seluruh counter.
@@ -392,6 +462,7 @@ class StockAnalytics
             'top_barang_habis' => $topHabis,
             'top_barang_tipis' => $topTipis,
             'top_aktivitas_barista' => $topAktivitas,
+            'stok_saat_ini' => array_values($currentStocks),
         ];
     }
 

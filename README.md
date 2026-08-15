@@ -127,8 +127,8 @@ Ikuti langkah-langkah berikut untuk menjalankan project secara lokal:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/username/ethikopia-coffeebay.git
-cd ethikopia-coffeebay/laravel-app
+git clone https://github.com/michaeldehaan34/Ethikopia-Stock-Management.git
+cd Ethikopia-Stock-Management
 
 # 2. Install dependency PHP
 composer install
