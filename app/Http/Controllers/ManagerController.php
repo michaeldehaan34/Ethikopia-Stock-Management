@@ -246,6 +246,36 @@ class ManagerController extends Controller
         ]);
     }
 
+    /**
+     * Normalisasi path foto menjadi URL publik yang valid.
+     *
+     * Mendukung berbagai format data yang mungkin tersimpan di database:
+     * - Relative path dari store(): "daily_clean/xxx.jpg"
+     * - Hanya filename (data lama): "xxx.jpg"
+     * - URL lengkap (data lama): "https://domain.com/storage/daily_clean/xxx.jpg"
+     *
+     * Menggunakan route 'daily-clean.photo' yang melayani file langsung
+     * dari storage tanpa membutuhkan symlink (kompatibel shared hosting).
+     */
+    private function normalizePhotoUrl(?string $filename): string
+    {
+        if (! $filename || trim($filename) === '') {
+            return '';
+        }
+
+        $filename = trim($filename);
+
+        // Jika sudah berupa URL lengkap, gunakan langsung
+        if (str_starts_with($filename, 'http://') || str_starts_with($filename, 'https://')) {
+            return $filename;
+        }
+
+        // Ekstrak hanya nama file (tanpa folder prefix)
+        $basename = basename($filename);
+
+        return route('daily-clean.photo', ['filename' => $basename]);
+    }
+
     public function dailyCleanDetail(int $id)
     {
         $rec = DailyClean::with('photos')->findOrFail($id);
@@ -255,8 +285,8 @@ class ManagerController extends Controller
             'shift' => $rec->shift,
             'barista' => $rec->barista,
             'photos' => $rec->photos->map(fn ($p) => [
-                'url' => asset('storage/'.$p->filename),
-                'name' => $p->original_name,
+                'url' => $this->normalizePhotoUrl($p->filename),
+                'name' => $p->original_name ?? 'Foto',
             ]),
         ]);
     }
@@ -269,8 +299,9 @@ class ManagerController extends Controller
         $rec = DailyClean::with('photos')->findOrFail($id);
 
         $photos = $rec->photos->map(fn ($p) => [
-            'url' => asset('storage/'.$p->filename),
-            'original_name' => $p->original_name,
+            'id' => $p->id,
+            'url' => $this->normalizePhotoUrl($p->filename),
+            'original_name' => $p->original_name ?? 'Foto',
         ]);
 
         return view('manager.riwayat-daily-clean.detail', [
@@ -278,6 +309,22 @@ class ManagerController extends Controller
             'record' => $rec,
             'photos' => $photos,
             'jumlah_foto' => $rec->photos->count(),
+        ]);
+    }
+
+    /**
+     * Halaman detail satu foto Daily Clean.
+     */
+    public function dailyCleanPhotoPage(int $dailyCleanId, int $photoId): View
+    {
+        $rec = DailyClean::findOrFail($dailyCleanId);
+        $photo = DailyCleanPhoto::where('daily_clean_id', $dailyCleanId)->findOrFail($photoId);
+
+        return view('manager.riwayat-daily-clean.photo', [
+            'title' => 'Detail Foto Daily Clean',
+            'record' => $rec,
+            'photo' => $photo,
+            'url' => $this->normalizePhotoUrl($photo->filename)
         ]);
     }
 
@@ -897,8 +944,6 @@ public function riwayatTokenListrik(Request $request): View
                 'barang_tipis' => $tipis,
                 'barang_habis' => $habis,
                 'has_data' => $data['has_data'],
-                'top_barang_habis' => StockAnalytics::topHabis($data, $limitMap, $keyToLabel),
-                'top_barang_tipis' => StockAnalytics::topTipis($data, $limitMap, $keyToLabel),
                 'aktivitas_barista' => StockAnalytics::aktivitasBarista($data),
                 'total_kebutuhan' => $forecast['total_kebutuhan'],
                 'total_estimasi_pembelian' => $forecast['total_estimasi_pembelian'],
@@ -1022,19 +1067,8 @@ public function riwayatTokenListrik(Request $request): View
                 $errors['password_lama'] = ['Password lama harus diisi jika ingin mengganti password.'];
             } else {
                 // Verifikasi password lama:
-                // - Jika sudah ada hash (non-legacy): gunakan Hash::check()
-                // - Jika belum ada hash (legacy account): fallback ke 6 digit terakhir no_telp
-                if ($manager->password) {
-                    // Akun non-legacy — verifikasi dengan hash yang tersimpan
-                    if (! Hash::check($passwordLama, $manager->password)) {
-                        $errors['password_lama'] = ['Password lama tidak sesuai.'];
-                    }
-                } else {
-                    // Legacy account (belum pernah ganti password) — verifikasi dengan 6 digit terakhir no_telp
-                    $expectedPassword = substr((string) $manager->no_telp, -6);
-                    if ($passwordLama !== $expectedPassword) {
-                        $errors['password_lama'] = ['Password lama tidak sesuai. Gunakan 6 digit terakhir nomor telepon.'];
-                    }
+                if (! $manager->password || ! Hash::check($passwordLama, $manager->password)) {
+                    $errors['password_lama'] = ['Password lama tidak sesuai.'];
                 }
             }
 

@@ -364,4 +364,28 @@ class BaristaController extends Controller
 
         return redirect()->route('barista.token-listrik');
     }
+
+    /**
+     * Serve file foto Daily Clean langsung dari storage.
+     *
+     * Dibutuhkan karena shared hosting (InfinityFree) tidak mendukung
+     * symlink, sehingga route /storage/... tidak bisa diakses.
+     * Route ini membaca file dari storage/app/public/ dan mengembalikan
+     * response dengan content-type yang sesuai.
+     */
+    public function serveDailyCleanPhoto(string $filename)
+    {
+        $path = 'daily_clean/'.$filename;
+
+        if (! Storage::disk('public')->exists($path)) {
+            abort(404, 'Foto tidak ditemukan.');
+        }
+
+        $mimeType = Storage::disk('public')->mimeType($path) ?: 'image/jpeg';
+        $content = Storage::disk('public')->get($path);
+
+        return response($content, 200)
+            ->header('Content-Type', $mimeType)
+            ->header('Cache-Control', 'public, max-age=86400');
+    }
 }

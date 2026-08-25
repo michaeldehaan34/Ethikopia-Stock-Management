@@ -56,7 +56,7 @@ class E2EFlowTest extends TestCase
 
     private function managerPassword(): string
     {
-        return $this->flaskPassword($this->manager->no_telp);
+        return 'password123';
     }
 
     private function loginAsManager(): void

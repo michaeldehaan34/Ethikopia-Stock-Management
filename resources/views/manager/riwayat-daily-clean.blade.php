@@ -161,15 +161,33 @@ function openPhotos(id) {
             var box = document.getElementById('mPhotos');
             box.innerHTML = '';
             if (!data.photos.length) {
-                box.innerHTML = '<div class="col-12 text-center text-muted">Tidak ada foto.</div>';
+                box.innerHTML = '<div class="col-12 text-center text-muted py-3"><i class="bi bi-camera-video-off" style="font-size:2rem;"></i><p class="mt-2 mb-0">Tidak ada foto.</p></div>';
                 return;
             }
             data.photos.forEach(function (p) {
                 var col = document.createElement('div');
                 col.className = 'col-6 col-md-4';
-                col.innerHTML =
-                    '<a href="' + p.url + '" target="_blank"><img src="' + p.url + '" class="img-fluid rounded border" style="object-fit:cover;height:160px;width:100%;" alt="' + p.name + '"></a>' +
-                    '<div class="small text-muted text-truncate mt-1">' + p.name + '</div>';
+                if (p.url) {
+                    var img = document.createElement('img');
+                    img.src = p.url;
+                    img.className = 'img-fluid rounded border';
+                    img.style.cssText = 'object-fit:cover;height:160px;width:100%;background:#2a2a2e;cursor:pointer;';
+                    img.alt = p.name || 'Foto';
+                    img.loading = 'lazy';
+                    img.onerror = function () {
+                        this.parentElement.innerHTML = '<div class="rounded border d-flex flex-column align-items-center justify-content-center" style="height:160px;width:100%;background:#2a2a2e;"><i class="bi bi-image-alt text-muted" style="font-size:2rem;"></i><small class="text-muted mt-1">Foto tidak tersedia</small></div>';
+                    };
+                    img.onclick = function () {
+                        window.open(p.url, '_blank');
+                    };
+                    col.appendChild(img);
+                } else {
+                    col.innerHTML = '<div class="rounded border d-flex flex-column align-items-center justify-content-center" style="height:160px;width:100%;background:#2a2a2e;"><i class="bi bi-image-alt text-muted" style="font-size:2rem;"></i><small class="text-muted mt-1">Foto tidak tersedia</small></div>';
+                }
+                var label = document.createElement('div');
+                label.className = 'small text-muted text-truncate mt-1';
+                label.textContent = p.name || 'Foto';
+                col.appendChild(label);
                 box.appendChild(col);
             });
         })

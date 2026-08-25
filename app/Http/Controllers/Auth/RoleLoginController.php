@@ -71,19 +71,18 @@ class RoleLoginController extends Controller
         // existing accounts keep working exactly as they did before.
         // ---- Dual Login Logic ----
         // Barista: always use legacy no_telp[-6:] (no password column).
-        // Manager: if password column has a hash, use Hash::check().
-        //          if password column is NULL (legacy account), fallback to no_telp[-6:].
+        // Manager: strictly verify against hashed password (no fallback).
         $passwordInput = $request->input('password');
 
-        if ($type === 'manager' && $account->password) {
-            // Manager dengan password hash — verifikasi pakai Hash::check()
-            if (! Hash::check($passwordInput, $account->password)) {
+        if ($type === 'manager') {
+            // Manager: Verifikasi ketat menggunakan password hash (harus ada)
+            if (! $account->password || ! Hash::check($passwordInput, $account->password)) {
                 return back()->withErrors([
                     'password' => 'Password salah.',
                 ])->onlyInput('username');
             }
         } else {
-            // Barista atau Manager legacy (password NULL) — fallback ke no_telp[-6:]
+            // Barista: fallback ke no_telp[-6:]
             $noTelp = (string) $account->no_telp;
 
             if (strlen($noTelp) < 6) {

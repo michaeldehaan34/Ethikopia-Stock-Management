@@ -512,6 +512,9 @@ class StockAnalytics
         $result['periode_valid'] = true;
         $current = $data['last_row'];
 
+        $awalRaw = UpdateStok::query()->whereDate('tanggal', '<', $tanggalAwal)->orderByDesc('tanggal')->orderByDesc('id')->first();
+        $stokMasukRows = StokMasuk::query()->whereDate('tanggal', '>=', $tanggalAwal)->whereDate('tanggal', '<=', $tanggalAkhir)->get();
+
         $totalKebutuhan = 0.0;
         $totalPembelian = 0.0;
         $labelToGroup = self::labelToGroup();
@@ -519,26 +522,32 @@ class StockAnalytics
         foreach ($data['item_keys'] as $key) {
             [$lh, $lt] = $limitMap[$key] ?? [self::DEFAULT_LIMIT_HABIS, self::DEFAULT_LIMIT_TIPIS];
 
-            $consumption = 0.0;
-            $prev = null;
-            foreach ($rows as $r) {
-                $v = self::toFloat($r['values'][$key] ?? null);
-                if ($v === null) {
-                    $v = 0.0;
-                }
-                if ($prev !== null && $prev > $v) {
-                    $consumption += ($prev - $v);
-                }
-                $prev = $v;
+            // 1. Stok Awal
+            $awalVal = $awalRaw ? (self::toFloat($awalRaw->$key) ?? 0.0) : 0.0;
+            
+            // 2. Stok Masuk
+            $masukVal = 0.0;
+            foreach ($stokMasukRows as $sm) {
+                $masukVal += self::toFloat($sm->$key) ?? 0.0;
+            }
+            
+            // 3. Stok Akhir (last row in the period, or Awal if no updates)
+            $akhirVal = $awalVal;
+            if (!empty($rows)) {
+                $lastRowInPeriod = end($rows);
+                $akhirVal = self::toFloat($lastRowInPeriod['values'][$key] ?? null) ?? 0.0;
             }
 
-            $kebutuhan = round($consumption, 2);
+            // Formula: Stok Awal + Stok Masuk - Stok Akhir
+            $consumption = $awalVal + $masukVal - $akhirVal;
+
+            $kebutuhan = round(max(0.0, $consumption), 2);
             $cur = $current ? self::toFloat($current['values'][$key] ?? null) : null;
             if ($cur === null) {
                 $cur = 0.0;
             }
             $estimasi = round(max(0.0, $kebutuhan - $cur), 2);
-            $status = $cur > $lt ? 'aman' : 'perlu_dibeli';
+            $status = $estimasi > 0 ? 'perlu_dibeli' : 'aman';
 
             $totalKebutuhan += $kebutuhan;
             $totalPembelian += $estimasi;

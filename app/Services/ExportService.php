@@ -697,8 +697,6 @@ class ExportService
                 'barang_tipis' => $tipis,
                 'barang_habis' => $habis,
                 'has_data' => $data['has_data'],
-                'top_barang_habis' => StockAnalytics::topHabis($data, $limitMap, $keyToLabel),
-                'top_barang_tipis' => StockAnalytics::topTipis($data, $limitMap, $keyToLabel),
                 'aktivitas_barista' => StockAnalytics::aktivitasBarista($data),
                 'total_kebutuhan' => $forecast['total_kebutuhan'],
                 'total_estimasi_pembelian' => $forecast['total_estimasi_pembelian'],
@@ -707,7 +705,7 @@ class ExportService
             ];
         }
 
-        $html = self::pdfHeader('Laporan Mingguan Inventory', $summary ? $summary['periode_label'] : 'Belum ada filter');
+        $html = self::pdfHeader('Laporan Inventory', $summary ? $summary['periode_label'] : 'Belum ada filter');
 
         if (! $summary) {
             $html .= '<p style="font-family:Helvetica,sans-serif;font-size:10pt;color:#555;">Pilih rentang tanggal terlebih dahulu.</p>';
@@ -722,26 +720,6 @@ class ExportService
         ], [130, 130, 130, 130]);
 
         $fullW = 530;
-
-        // Top Barang Habis
-        $html .= '<div style="font-family:Helvetica,sans-serif;font-size:10pt;font-weight:bold;color:#6F4E37;margin:8px 0 4px;padding:4px 6px;background-color:#6F4E37;color:white;">Top Barang Paling Sering Habis</div>';
-        if (! empty($summary['top_barang_habis'])) {
-            $rows = [['Rank', 'Nama Barang', 'Jumlah Habis']];
-            foreach ($summary['top_barang_habis'] as $it) {
-                $rows[] = [$it['rank'], $it['nama_barang'], $it['jumlah']];
-            }
-            $html .= self::pdfTable($rows, [60, $fullW - 180, 120]);
-        }
-
-        // Top Barang Tipis / Hampir Habis
-        $html .= '<div style="font-family:Helvetica,sans-serif;font-size:10pt;font-weight:bold;color:#6F4E37;margin:8px 0 4px;padding:4px 6px;background-color:#6F4E37;color:white;">Top Barang Hampir Habis</div>';
-        if (! empty($summary['top_barang_tipis'])) {
-            $rows = [['Rank', 'Nama Barang', 'Jumlah Tipis']];
-            foreach ($summary['top_barang_tipis'] as $it) {
-                $rows[] = [$it['rank'], $it['nama_barang'], $it['jumlah']];
-            }
-            $html .= self::pdfTable($rows, [60, $fullW - 180, 120]);
-        }
 
         // Aktivitas Barista
         if (! empty($summary['aktivitas_barista'])) {
@@ -825,10 +803,21 @@ class ExportService
     // =========================================================
     private static function pdfHeader(string $title, string $periode): string
     {
-        $logoPath = public_path('static/img/logo.png');
+        // Cari logo di beberapa kemungkinan path karena struktur folder
+        // shared hosting (InfinityFree) seringkali berbeda (menggunakan htdocs).
+        $paths = [
+            public_path('static/img/logo.png'),
+            base_path('htdocs/static/img/logo.png'),
+            base_path('static/img/logo.png'),
+            $_SERVER['DOCUMENT_ROOT'] . '/static/img/logo.png'
+        ];
+
         $logoB64 = '';
-        if (file_exists($logoPath)) {
-            $logoB64 = base64_encode(file_get_contents($logoPath));
+        foreach ($paths as $path) {
+            if (file_exists($path)) {
+                $logoB64 = base64_encode(file_get_contents($path));
+                break;
+            }
         }
 
         $html = '<html><head>

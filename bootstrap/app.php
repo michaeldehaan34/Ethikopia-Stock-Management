@@ -37,6 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
             $middleware->validateCsrfTokens(except: ['*']);
         }
 
+        // Mengizinkan Reverse Proxy (seperti Cloudflare) agar protokol HTTPS 
+        // terdeteksi dengan benar dan URL aset tidak berubah menjadi HTTP.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'auth' => Authenticate::class,
             'auth.basic' => AuthenticateWithBasicAuth::class,

@@ -16,11 +16,13 @@ class ManagerSeeder extends Seeder
             [
                 'username' => 'manager_satu',
                 'no_telp' => '081298765432',
+                'password' => \Illuminate\Support\Facades\Hash::make('password123'),
                 'created_at' => now(),
             ],
             [
                 'username' => 'manager_dua',
                 'no_telp' => '081298765433',
+                'password' => \Illuminate\Support\Facades\Hash::make('password123'),
                 'created_at' => now(),
             ],
         ];
@@ -30,6 +32,7 @@ class ManagerSeeder extends Seeder
                 ['username' => $account['username']],
                 [
                     'no_telp' => $account['no_telp'],
+                    'password' => $account['password'],
                     'created_at' => $account['created_at'],
                 ]
             );

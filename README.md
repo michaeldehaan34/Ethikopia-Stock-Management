@@ -241,9 +241,23 @@ Sistem **Ethikopia Coffeebay** dikembangkan sebagai solusi manajemen operasional
 
 - **Kemudahan penggunaan** — antarmuka yang intuitif dengan pembagian peran yang jelas.
 - **Efisiensi operasional** — pencatatan digital yang menggantikan pencatatan manual.
-- **Monitoring stok real-time** — dashboard dan notifikasi limit stok untuk pengambilan keputusan yang cepat.
-- **Akurasi data** — validasi input otomatis dan riwayat pencatatan yang lengkap.
-- **Portabilitas** — aplikasi web yang dapat diakses dari berbagai perangkat.
+- **Monitoring stok real-time** — dashboard dan notifikasi limit stok (*limit tipis* & *limit habis*) untuk pengambilan keputusan yang cepat.
+- **Akurasi data** — validasi input otomatis, sinkronisasi skema dinamis, dan riwayat pencatatan yang lengkap.
+- **Prediksi Kebutuhan (Forecast)** — algoritma perhitungan kebutuhan dan estimasi pembelian yang telah divalidasi sesuai *business logic* (tidak merekomendasikan *over-purchasing*).
 
 Dibangun dengan arsitektur MVC Laravel, sistem ini mengimplementasikan konsep **Single Source of Truth** melalui service `StockAnalytics` untuk seluruh perhitungan analitik, serta **export service** yang menghasilkan laporan dalam format PDF dan Excel sesuai standar pelaporan profesional.
 
+### Arsitektur Tabel Dinamis (Dynamic Columns)
+Berbeda dengan sistem EAV (Entity-Attribute-Value) konvensional yang sering mengalami kendala performa (N+1 queries), sistem ini menggunakan arsitektur modifikasi skema tabel dinamis (ALTER TABLE). Setiap penambahan/perubahan Master Bahan akan otomatis menambah/menyesuaikan kolom pada tabel transaksi (`update_stok` & `stok_masuk`), menjamin pembacaan data stok secara instan dan hemat query.
+
+---
+
+## 🌐 Panduan Deployment (InfinityFree)
+
+Aplikasi ini sudah dipersiapkan (*production-ready*) untuk di-deploy ke shared hosting gratis seperti **InfinityFree**.
+
+1. **Persiapan:** `.htaccess` root sudah disediakan agar request otomatis diarahkan ke folder `public/`. Tidak perlu memodifikasi struktur inti Laravel.
+2. **Export Database:** Pastikan melakukan export data khusus Master Data (`bahan`, `bahan_limit`, `roles`, `users`), dan truncate tabel transaksi jika ingin data operasional kosong di server live.
+3. **Konfigurasi Lingkungan:** Atur `.env` menjadi `APP_ENV=production`, `APP_DEBUG=false`, dan sesuaikan kredensial database InfinityFree.
+4. Upload semua file (tanpa `node_modules` dan `.git`) menggunakan form zip lalu ekstrak di folder `htdocs`.
+*(Untuk langkah lebih detail, silakan merujuk pada file `docs/infinityfree-deployment-checklist.md`)*.

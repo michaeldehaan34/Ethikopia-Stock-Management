@@ -81,7 +81,7 @@ class BahanSeeder extends Seeder
         ['tisu_kotak', 'Tisu Kotak', 'Equipment', 'Equipment', 'pcs'],
         ['tisu_bulat', 'Tisu Bulat', 'Equipment', 'Equipment', 'pcs'],
         ['sedotan_lancip', 'Sedotan Lancip', 'Equipment', 'Equipment', 'pcs'],
-        ['sedotan_stierer', 'Sedotan Stierer', 'Equipment', 'Equipment', 'pcs'],
+        ['sedotan_stirrer', 'Sedotan Stirrer', 'Equipment', 'Equipment', 'pcs'],
         ['kantong_plastik_m', 'Kantong Plastik M', 'Equipment', 'Equipment', 'pcs'],
         ['kantong_plastik_l', 'Kantong Plastik L', 'Equipment', 'Equipment', 'pcs'],
         ['plastik_wrap', 'Plastik Wrap', 'Equipment', 'Equipment', 'roll'],

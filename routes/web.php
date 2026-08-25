@@ -55,6 +55,12 @@ Route::middleware(['session.auth', 'role:barista,manager'])->group(function () {
 
     Route::post('/barista/token-listrik/store', [BaristaController::class, 'tokenListrikStore'])
         ->name('barista.token-listrik.store');
+
+    // Serve file foto Daily Clean langsung dari storage (tanpa symlink).
+    // Dibutuhkan karena InfinityFree shared hosting tidak mendukung symlink.
+    Route::get('/storage-file/daily_clean/{filename}', [BaristaController::class, 'serveDailyCleanPhoto'])
+        ->where('filename', '.+')
+        ->name('daily-clean.photo');
 });
 
 /*
@@ -195,6 +201,10 @@ Route::middleware(['session.auth', 'role:manager'])->group(function () {
     // Daily Clean detail page (full page, bukan modal)
     Route::get('/manager/riwayat/daily-clean/view/{id}', [ManagerController::class, 'dailyCleanDetailPage'])
         ->name('manager.daily-clean.detail');
+
+    // Daily Clean photo detail page
+    Route::get('/manager/riwayat/daily-clean/{dailyCleanId}/photo/{photoId}', [ManagerController::class, 'dailyCleanPhotoPage'])
+        ->name('manager.daily-clean.photo');
 
     // Daily Clean delete (single)
     Route::delete('/manager/riwayat/daily-clean/hapus/{id}', [ManagerController::class, 'dailyCleanDestroy'])

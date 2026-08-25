@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="page-container">
-    <!-- Header -->
+    {{-- Header --}}
     <div class="row mb-3">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <!-- Info Card -->
+    {{-- Info Card --}}
     <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
             <div class="card border-0 shadow-sm">
@@ -45,14 +45,23 @@
 
                     @if (count($photos) > 0)
                         <div class="row g-3">
-                            @foreach ($photos as $photo)
+                            @foreach ($photos as $index => $photo)
                                 <div class="col-6 col-md-4">
-                                    <a href="{{ $photo['url'] }}" target="_blank">
-                                        <img src="{{ $photo['url'] }}"
-                                             class="img-fluid rounded border"
-                                             style="object-fit:cover;height:160px;width:100%;"
-                                             alt="{{ $photo['original_name'] ?? 'Foto' }}">
-                                    </a>
+                                    @if (!empty($photo['url']))
+                                        <a href="{{ route('manager.daily-clean.photo', ['dailyCleanId' => $record->id, 'photoId' => $photo['id']]) }}" class="dc-photo-wrapper d-block" style="text-decoration:none;">
+                                            <img src="{{ $photo['url'] }}"
+                                                 class="img-fluid rounded border dc-photo-img"
+                                                 style="object-fit:cover;height:160px;width:100%;background:#2a2a2e;"
+                                                 alt="{{ $photo['original_name'] ?? 'Foto' }}"
+                                                 loading="lazy"
+                                                 onerror="this.parentElement.innerHTML='<div class=\'dc-photo-error rounded border d-flex flex-column align-items-center justify-content-center\' style=\'height:160px;width:100%;background:#2a2a2e;\'><i class=\'bi bi-image-alt text-muted\' style=\'font-size:2rem;\'></i><small class=\'text-muted mt-1\'>Foto tidak tersedia</small></div>';">
+                                        </a>
+                                    @else
+                                        <div class="dc-photo-error rounded border d-flex flex-column align-items-center justify-content-center" style="height:160px;width:100%;background:#2a2a2e;">
+                                            <i class="bi bi-image-alt text-muted" style="font-size:2rem;"></i>
+                                            <small class="text-muted mt-1">Foto tidak tersedia</small>
+                                        </div>
+                                    @endif
                                     <div class="small text-muted text-truncate mt-1">
                                         {{ $photo['original_name'] ?? 'Foto' }}
                                     </div>
@@ -60,7 +69,10 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-muted text-center py-3 mb-0">Tidak ada foto.</p>
+                        <div class="text-center py-4">
+                            <i class="bi bi-camera-video-off text-muted" style="font-size:2.5rem;"></i>
+                            <p class="text-muted mt-2 mb-0">Tidak ada foto untuk Daily Clean ini.</p>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -68,4 +80,3 @@
     </div>
 </div>
 @endsection
-
