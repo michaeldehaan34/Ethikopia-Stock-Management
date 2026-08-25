@@ -109,58 +109,6 @@ Barista memiliki akses terbatas untuk pencatatan operasional harian:
 ├── composer.json              # Dependency PHP
 └── package.json               # Dependency frontend
 ```
-
----
-
-## 🚀 Instalasi
-
-Ikuti langkah-langkah berikut untuk menjalankan project secara lokal:
-
-### Prasyarat
-
-- PHP >= 8.2
-- Composer
-- MySQL / MariaDB
-- Node.js & npm (untuk kompilasi asset)
-
-### Langkah Instalasi
-
-```bash
-# 1. Clone repository
-git clone https://github.com/michaeldehaan34/Ethikopia-Stock-Management.git
-cd Ethikopia-Stock-Management
-
-# 2. Install dependency PHP
-composer install
-
-# 3. Copy file environment
-cp .env.example .env
-
-# 4. Generate application key
-php artisan key:generate
-
-# 5. Konfigurasi database di file .env
-#    DB_DATABASE=ethikopia
-#    DB_USERNAME=root
-#    DB_PASSWORD=
-
-# 6. Jalankan migrasi dan seeder
-php artisan migrate --seed
-
-# 7. Install dan kompilasi asset frontend
-npm install
-npm run build
-
-# 8. Jalankan development server
-php artisan serve
-```
-
-Akses aplikasi di `http://localhost:8000`.
-
-> **Catatan:** Login menggunakan akun yang telah di-seed. Password default untuk Barista adalah 6 digit terakhir nomor telepon. Untuk Manager, gunakan password yang telah ditentukan saat seeding.
-
----
-
 ## 📸 Screenshot
 
 > Dokumentasi visual akan segera ditambahkan.
